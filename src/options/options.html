@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Wikipedia Language Shortcuts Settings</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6f8fb;
+        --panel: #ffffff;
+        --text: #1f2328;
+        --muted: #59636e;
+        --accent: #0b57d0;
+        --border: #d0d7de;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+        color: var(--text);
+        background: radial-gradient(circle at 10% 10%, #eaf2ff 0%, #f6f8fb 45%);
+      }
+
+      .container {
+        max-width: 860px;
+        margin: 2rem auto;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+      }
+
+      h1 {
+        margin: 0 0 0.4rem;
+        font-size: 1.5rem;
+      }
+
+      p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .section {
+        margin-top: 1.4rem;
+      }
+
+      .label {
+        display: block;
+        margin-bottom: 0.45rem;
+        font-weight: 600;
+      }
+
+      input[type="search"],
+      select {
+        width: 100%;
+        padding: 0.6rem 0.7rem;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 0.95rem;
+      }
+
+      .lang-grid {
+        margin-top: 0.75rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+        gap: 0.5rem;
+        max-height: 360px;
+        overflow: auto;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 0.7rem;
+        background: #fafbfc;
+      }
+
+      .lang-item {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.35rem 0.4rem;
+        border-radius: 8px;
+      }
+
+      .lang-item:hover {
+        background: #eef4ff;
+      }
+
+      .inline {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .actions {
+        margin-top: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+      }
+
+      button {
+        border: 0;
+        background: var(--accent);
+        color: #fff;
+        padding: 0.58rem 1rem;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      #status {
+        color: #1a7f37;
+        font-size: 0.9rem;
+        min-height: 1.2rem;
+      }
+
+      @media (max-width: 680px) {
+        .container {
+          margin: 0;
+          border-radius: 0;
+          min-height: 100vh;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <h1>Wikipedia Language Shortcuts</h1>
+      <p>Pick your visible language flags and optional default redirect language.</p>
+
+      <section class="section">
+        <label class="label" for="language-search">Search languages</label>
+        <input id="language-search" type="search" placeholder="Type name or code (e.g. german, de)" />
+        <div id="language-list" class="lang-grid" aria-live="polite"></div>
+      </section>
+
+      <section class="section">
+        <label class="label" for="default-language">Default redirect language (article pages only)</label>
+        <select id="default-language"></select>
+      </section>
+
+      <section class="section inline">
+        <input id="auto-redirect-enabled" type="checkbox" checked />
+        <label for="auto-redirect-enabled">Enable automatic redirect when default language version exists</label>
+      </section>
+
+      <div class="actions">
+        <button id="save-button" type="button">Save settings</button>
+        <div id="status" role="status"></div>
+      </div>
+    </main>
+
+    <script src="../shared/languages.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>

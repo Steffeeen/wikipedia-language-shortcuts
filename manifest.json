@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Wikipedia Language Shortcuts",
+  "version": "0.1.0",
+  "description": "Adds flag-based language shortcuts next to Wikipedia article titles and supports optional default-language redirects.",
+  "permissions": ["storage"],
+  "host_permissions": ["*://*.wikipedia.org/*"],
+  "content_scripts": [
+    {
+      "matches": ["*://*.wikipedia.org/wiki/*"],
+      "js": ["src/shared/languages.js", "src/content/content.js"],
+      "css": ["src/content/content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_page": "src/options/options.html"
+}
