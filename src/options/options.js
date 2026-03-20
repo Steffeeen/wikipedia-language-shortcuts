@@ -136,7 +136,7 @@
 
   function setStatus(message, isError = false) {
     statusEl.textContent = message;
-    statusEl.style.color = isError ? "#b42318" : "#1a7f37";
+    statusEl.style.color = isError ? "var(--error)" : "var(--success)";
 
     if (!isError) {
       window.setTimeout(() => {

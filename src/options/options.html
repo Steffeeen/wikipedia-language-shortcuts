@@ -8,11 +8,33 @@
       :root {
         color-scheme: light;
         --bg: #f6f8fb;
+        --bg-accent: #eaf2ff;
         --panel: #ffffff;
         --text: #1f2328;
         --muted: #59636e;
         --accent: #0b57d0;
         --border: #d0d7de;
+        --list-bg: #fafbfc;
+        --list-hover: #eef4ff;
+        --success: #1a7f37;
+        --error: #b42318;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color-scheme: dark;
+          --bg: #11161d;
+          --bg-accent: #18212e;
+          --panel: #1b2430;
+          --text: #e7edf4;
+          --muted: #a9b5c2;
+          --accent: #7aa2ff;
+          --border: #334155;
+          --list-bg: #131b26;
+          --list-hover: #233247;
+          --success: #53d486;
+          --error: #ff7b72;
+        }
       }
 
       * {
@@ -23,7 +45,7 @@
         margin: 0;
         font-family: "Segoe UI", "Helvetica Neue", sans-serif;
         color: var(--text);
-        background: radial-gradient(circle at 10% 10%, #eaf2ff 0%, #f6f8fb 45%);
+        background: radial-gradient(circle at 10% 10%, var(--bg-accent) 0%, var(--bg) 45%);
       }
 
       .container {
@@ -61,6 +83,8 @@
         width: 100%;
         padding: 0.6rem 0.7rem;
         border: 1px solid var(--border);
+        color: var(--text);
+        background: var(--panel);
         border-radius: 10px;
         font-size: 0.95rem;
       }
@@ -75,7 +99,7 @@
         border: 1px solid var(--border);
         border-radius: 10px;
         padding: 0.7rem;
-        background: #fafbfc;
+        background: var(--list-bg);
       }
 
       .lang-item {
@@ -87,7 +111,7 @@
       }
 
       .lang-item:hover {
-        background: #eef4ff;
+        background: var(--list-hover);
       }
 
       .inline {
@@ -114,7 +138,7 @@
       }
 
       #status {
-        color: #1a7f37;
+        color: var(--success);
         font-size: 0.9rem;
         min-height: 1.2rem;
       }

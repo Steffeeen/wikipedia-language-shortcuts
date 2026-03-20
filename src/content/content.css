@@ -1,3 +1,33 @@
+.mw-body,
+html {
+  --wls-chip-bg-hover: #f8f9fa;
+  --wls-chip-border-hover: #a2a9b1;
+  --wls-chip-focus: #36c;
+  --wls-chip-current-bg: #eaf3ff;
+  --wls-chip-current-border: #36c;
+}
+
+@media (prefers-color-scheme: dark) {
+  .mw-body,
+  html {
+    --wls-chip-bg-hover: #2a2f36;
+    --wls-chip-border-hover: #5c6670;
+    --wls-chip-focus: #7aa2ff;
+    --wls-chip-current-bg: #1e314f;
+    --wls-chip-current-border: #7aa2ff;
+  }
+}
+
+html[class*="night"],
+body[class*="night"],
+html[data-theme="dark"] {
+  --wls-chip-bg-hover: #2a2f36;
+  --wls-chip-border-hover: #5c6670;
+  --wls-chip-focus: #7aa2ff;
+  --wls-chip-current-bg: #1e314f;
+  --wls-chip-current-border: #7aa2ff;
+}
+
 .wls-container {
   display: inline-flex;
   flex-wrap: wrap;
@@ -27,19 +57,19 @@
 }
 
 .wls-chip:hover {
-  background: #f8f9fa;
-  border-color: #a2a9b1;
+  background: var(--wls-chip-bg-hover);
+  border-color: var(--wls-chip-border-hover);
   transform: translateY(-1px);
 }
 
 .wls-chip:focus-visible {
-  outline: 2px solid #36c;
+  outline: 2px solid var(--wls-chip-focus);
   outline-offset: 2px;
 }
 
 .wls-chip.is-current {
-  border-color: #36c;
-  background: #eaf3ff;
+  border-color: var(--wls-chip-current-border);
+  background: var(--wls-chip-current-bg);
 }
 
 @media (max-width: 720px) {
