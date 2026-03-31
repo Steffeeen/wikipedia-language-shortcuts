@@ -18,7 +18,9 @@
     "Topic:"
   ];
 
-  const MANUAL_BYPASS_PARAM = "wls_manual";
+  const MANUAL_OVERRIDE_PARAM = "wls_manual_lang";
+  const LEGACY_MANUAL_BYPASS_PARAM = "wls_manual";
+  const MANUAL_OVERRIDE_STORAGE_KEY = "wls_manual_override_lang";
   const SWITCHER_ID = "wls-language-switcher";
 
   const shared = window.WIKI_LANG_SHORTCUTS;
@@ -49,6 +51,8 @@
       return;
     }
 
+    const manualOverrideLanguage = syncManualOverride(pageInfo.langCode);
+
     const langLinks = await fetchLanguageLinks(pageInfo.langCode, pageInfo.title);
     const languageMap = Object.assign({}, langLinks);
     languageMap[pageInfo.langCode] = {
@@ -56,7 +60,7 @@
       title: pageInfo.title
     };
 
-    maybeRedirect(settings, pageInfo, languageMap);
+    maybeRedirect(settings, pageInfo, languageMap, manualOverrideLanguage);
     renderSwitcher(languageMap, settings, pageInfo.langCode);
   }
 
@@ -148,21 +152,20 @@
     }, {});
   }
 
-  function maybeRedirect(settings, pageInfo, languageMap) {
+  function maybeRedirect(settings, pageInfo, languageMap, manualOverrideLanguage = "") {
     if (!settings.autoRedirectEnabled) {
       return;
     }
 
-    const targetLang = settings.defaultRedirectLanguage;
+    const manualTargetLang = normalizeLanguageCode(manualOverrideLanguage);
+    const defaultTargetLang = normalizeLanguageCode(settings.defaultRedirectLanguage);
+    const targetLang = manualTargetLang || defaultTargetLang;
+
     if (!targetLang || targetLang === pageInfo.langCode) {
-      cleanupManualBypass();
       return;
     }
 
-    const url = new URL(window.location.href);
-    const hasManualBypass = url.searchParams.get(MANUAL_BYPASS_PARAM) === "1";
-    if (hasManualBypass) {
-      cleanupManualBypass();
+    if (manualTargetLang && !languageMap[manualTargetLang]?.url) {
       return;
     }
 
@@ -174,14 +177,38 @@
     window.location.replace(target.url);
   }
 
-  function cleanupManualBypass() {
+  function syncManualOverride(currentLang) {
     const url = new URL(window.location.href);
-    if (!url.searchParams.has(MANUAL_BYPASS_PARAM)) {
+    const explicitLangFromParam = normalizeLanguageCode(url.searchParams.get(MANUAL_OVERRIDE_PARAM));
+    const legacyBypass = url.searchParams.get(LEGACY_MANUAL_BYPASS_PARAM) === "1";
+
+    if (explicitLangFromParam) {
+      sessionStorage.setItem(MANUAL_OVERRIDE_STORAGE_KEY, explicitLangFromParam);
+    } else if (legacyBypass) {
+      sessionStorage.setItem(MANUAL_OVERRIDE_STORAGE_KEY, normalizeLanguageCode(currentLang));
+    }
+
+    cleanupManualBypassParams(url);
+    return normalizeLanguageCode(sessionStorage.getItem(MANUAL_OVERRIDE_STORAGE_KEY));
+  }
+
+  function cleanupManualBypassParams(url = new URL(window.location.href)) {
+    if (!url.searchParams.has(MANUAL_OVERRIDE_PARAM) && !url.searchParams.has(LEGACY_MANUAL_BYPASS_PARAM)) {
       return;
     }
 
-    url.searchParams.delete(MANUAL_BYPASS_PARAM);
+    url.searchParams.delete(MANUAL_OVERRIDE_PARAM);
+    url.searchParams.delete(LEGACY_MANUAL_BYPASS_PARAM);
     window.history.replaceState({}, "", url.toString());
+  }
+
+  function normalizeLanguageCode(code) {
+    if (typeof code !== "string") {
+      return "";
+    }
+
+    const normalized = code.trim().toLowerCase();
+    return LANGUAGE_MAP[normalized] ? normalized : "";
   }
 
   function renderSwitcher(languageMap, settings = DEFAULT_SETTINGS, currentLang = "") {
@@ -225,7 +252,7 @@
 
       if (!item.isCurrent) {
         const targetUrl = new URL(item.url);
-        targetUrl.searchParams.set(MANUAL_BYPASS_PARAM, "1");
+        targetUrl.searchParams.set(MANUAL_OVERRIDE_PARAM, item.code);
         link.href = targetUrl.toString();
       }
 
