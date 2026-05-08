@@ -61,6 +61,7 @@
     };
 
     maybeRedirect(settings, pageInfo, languageMap, manualOverrideLanguage);
+    propagateManualOverrideToLinks(manualOverrideLanguage);
     renderSwitcher(languageMap, settings, pageInfo.langCode);
   }
 
@@ -209,6 +210,43 @@
 
     const normalized = code.trim().toLowerCase();
     return LANGUAGE_MAP[normalized] ? normalized : "";
+  }
+
+  function propagateManualOverrideToLinks(manualOverrideLanguage) {
+    const overrideLang = normalizeLanguageCode(manualOverrideLanguage);
+    if (!overrideLang) {
+      return;
+    }
+
+    const links = document.querySelectorAll("a[href]");
+    for (const link of links) {
+      const rawHref = link.getAttribute("href");
+      if (!rawHref || rawHref.startsWith("#")) {
+        continue;
+      }
+
+      let url;
+      try {
+        url = new URL(rawHref, window.location.href);
+      } catch {
+        continue;
+      }
+
+      if (!/\.wikipedia\.org$/i.test(url.hostname)) {
+        continue;
+      }
+
+      if (!url.pathname.startsWith("/wiki/")) {
+        continue;
+      }
+
+      if (url.searchParams.get(MANUAL_OVERRIDE_PARAM) === overrideLang) {
+        continue;
+      }
+
+      url.searchParams.set(MANUAL_OVERRIDE_PARAM, overrideLang);
+      link.setAttribute("href", url.toString());
+    }
   }
 
   function renderSwitcher(languageMap, settings = DEFAULT_SETTINGS, currentLang = "") {
