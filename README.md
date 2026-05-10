@@ -1,4 +1,5 @@
 # Wikipedia Language Shortcuts
+
 <sup>Built mostly by GPT-5.3 Codex using [opencode](https://opencode.ai).</sup>
 
 Chrome extension that adds language flag shortcuts next to Wikipedia article titles and can auto-redirect article pages to your preferred language when available.
