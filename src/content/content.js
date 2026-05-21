@@ -61,7 +61,7 @@
     };
 
     maybeRedirect(settings, pageInfo, languageMap, manualOverrideLanguage);
-    propagateManualOverrideToLinks(manualOverrideLanguage);
+    setupManualOverrideLinkPropagation(manualOverrideLanguage);
     renderSwitcher(languageMap, settings, pageInfo.langCode);
   }
 
@@ -212,41 +212,59 @@
     return LANGUAGE_MAP[normalized] ? normalized : "";
   }
 
-  function propagateManualOverrideToLinks(manualOverrideLanguage) {
+  function setupManualOverrideLinkPropagation(manualOverrideLanguage) {
     const overrideLang = normalizeLanguageCode(manualOverrideLanguage);
     if (!overrideLang) {
       return;
     }
 
-    const links = document.querySelectorAll("a[href]");
-    for (const link of links) {
-      const rawHref = link.getAttribute("href");
-      if (!rawHref || rawHref.startsWith("#")) {
-        continue;
-      }
+    const events = ["mousedown", "auxclick", "click", "contextmenu"];
+    for (const eventName of events) {
+      document.addEventListener(eventName, (event) => {
+        const link = event.target instanceof Element ? event.target.closest("a[href]") : null;
+        if (!link) {
+          return;
+        }
 
-      let url;
-      try {
-        url = new URL(rawHref, window.location.href);
-      } catch {
-        continue;
-      }
-
-      if (!/\.wikipedia\.org$/i.test(url.hostname)) {
-        continue;
-      }
-
-      if (!url.pathname.startsWith("/wiki/")) {
-        continue;
-      }
-
-      if (url.searchParams.get(MANUAL_OVERRIDE_PARAM) === overrideLang) {
-        continue;
-      }
-
-      url.searchParams.set(MANUAL_OVERRIDE_PARAM, overrideLang);
-      link.setAttribute("href", url.toString());
+        applyManualOverrideToLink(link, overrideLang);
+      }, true);
     }
+  }
+
+  function applyManualOverrideToLink(link, overrideLang) {
+    const rawHref = link.getAttribute("href");
+    if (!rawHref || rawHref.startsWith("#")) {
+      return;
+    }
+
+    let url;
+    try {
+      url = new URL(rawHref, window.location.href);
+    } catch {
+      return;
+    }
+
+    if (!/\.wikipedia\.org$/i.test(url.hostname)) {
+      return;
+    }
+
+    if (!url.pathname.startsWith("/wiki/")) {
+      return;
+    }
+
+    if (url.searchParams.get(MANUAL_OVERRIDE_PARAM) === overrideLang) {
+      return;
+    }
+
+    const originalHref = rawHref;
+    url.searchParams.set(MANUAL_OVERRIDE_PARAM, overrideLang);
+    link.setAttribute("href", url.toString());
+
+    window.setTimeout(() => {
+      if (link.isConnected) {
+        link.setAttribute("href", originalHref);
+      }
+    }, 0);
   }
 
   function renderSwitcher(languageMap, settings = DEFAULT_SETTINGS, currentLang = "") {
